@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/01 15:20:36 by kskender          #+#    #+#             */
-/*   Updated: 2025/04/18 14:34:09 by kskender         ###   ########.fr       */
+/*   Created: 2025/04/18 14:28:51 by kskender          #+#    #+#             */
+/*   Updated: 2025/04/22 09:45:06 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*find_newline(char *str)
 {
@@ -102,41 +102,18 @@ char	*clean_buffer(char *buffer)
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer;
+	static char	*buffer[OPEN_MAX];
 	char		*line;
 
 	line = NULL;
 	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
-		return (ft_free(&buffer), NULL);
-	buffer = read2buffer(fd, buffer);
-	if (!buffer)
+		return (ft_free(&buffer[fd]), NULL);
+	buffer[fd] = read2buffer(fd, buffer[fd]);
+	if (!buffer[fd])
 		return (NULL);
-	line = extract_line(buffer);
+	line = extract_line(buffer[fd]);
 	if (!line)
-		return (ft_free(&buffer));
-	buffer = clean_buffer(buffer);
+		return (ft_free(&buffer[fd]));
+	buffer[fd] = clean_buffer(buffer[fd]);
 	return (line);
 }
-
-/* #include <fcntl.h>
-#include <stdio.h>
-
-int	main(void)
-{
-	int		fd;
-	char	*next_line;
-	int		count;
-	int		i;
-
-	i = 0;
-	count = 0;
-	fd = open("example.txt", O_RDONLY);
-	while (i++ < 10)
-	{
-		next_line = get_next_line(fd);
-		printf("Line: %s", next_line);
-		free(next_line);
-	}
-	close(fd);
-	return (0);
-} */
